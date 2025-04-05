@@ -1,0 +1,222 @@
+local player = game.Players.LocalPlayer
+local screenGui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
+screenGui.Name = "Nebula"
+screenGui.ResetOnSpawn = false
+
+-- Main Window
+local mainFrame = Instance.new("Frame")
+mainFrame.Size = UDim2.new(0, 500, 0, 300)
+mainFrame.Position = UDim2.new(0.5, -250, 0.5, -150)
+mainFrame.BackgroundColor3 = Color3.fromRGB(28, 28, 28)  -- Darker background
+mainFrame.BorderSizePixel = 0
+mainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+mainFrame.Parent = screenGui
+
+-- Header Bar
+local titleBar = Instance.new("Frame")
+titleBar.Size = UDim2.new(1, 0, 0, 40)  -- Height updated for a sleeker look
+titleBar.Position = UDim2.new(0, 0, 0, 0)
+titleBar.BackgroundColor3 = Color3.fromRGB(42, 42, 42)
+titleBar.BorderSizePixel = 0
+titleBar.Parent = mainFrame
+
+local titleLabel = Instance.new("TextLabel")
+titleLabel.Size = UDim2.new(1, -60, 1, 0)
+titleLabel.Text = "|Nebula| - Roblox Utility"
+titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+titleLabel.BackgroundTransparency = 1
+titleLabel.Font = Enum.Font.Gotham
+titleLabel.TextSize = 18
+titleLabel.TextXAlignment = Enum.TextXAlignment.Left
+titleLabel.Position = UDim2.new(0, 10, 0, 0)
+titleLabel.Parent = titleBar
+
+-- Close Button
+local closeButton = Instance.new("TextButton")
+closeButton.Size = UDim2.new(0, 30, 0, 30)
+closeButton.Position = UDim2.new(1, -30, 0, 0)
+closeButton.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+closeButton.Text = "X"
+closeButton.Font = Enum.Font.Code
+closeButton.TextColor3 = Color3.fromRGB(255, 100, 100)
+closeButton.TextSize = 16
+closeButton.BorderSizePixel = 0
+closeButton.Parent = titleBar
+
+closeButton.MouseButton1Click:Connect(function()
+    screenGui:Destroy()
+end)
+
+-- TextBox
+local textBox = Instance.new("TextBox")
+textBox.Size = UDim2.new(1, -40, 0, 120)  -- Adjusted size for better fit
+textBox.Position = UDim2.new(0, 10, 0, 50)
+textBox.PlaceholderText = "-- Enter script here"
+textBox.Text = ""
+textBox.BackgroundColor3 = Color3.fromRGB(24, 24, 24)
+textBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+textBox.ClearTextOnFocus = false
+textBox.Font = Enum.Font.Code
+textBox.TextSize = 14
+textBox.TextXAlignment = Enum.TextXAlignment.Left
+textBox.TextYAlignment = Enum.TextYAlignment.Top
+textBox.MultiLine = true
+textBox.BorderSizePixel = 0
+textBox.Parent = mainFrame
+
+-- Button Factory
+local function createButton(name, posY)
+    local button = Instance.new("TextButton")
+    button.Size = UDim2.new(1, -20, 0, 40)
+    button.Position = UDim2.new(0, 10, 0, posY)
+    button.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    button.TextColor3 = Color3.fromRGB(255, 255, 255)
+    button.Text = name
+    button.Font = Enum.Font.Gotham
+    button.TextSize = 16
+    button.BorderSizePixel = 0
+    button.AutoButtonColor = true
+    button.Parent = mainFrame
+    return button
+end
+
+-- Execute Button
+local executeButton = createButton("Execute", 180)
+executeButton.MouseButton1Click:Connect(function()
+    local code = textBox.Text
+    if code and code ~= "" then
+        local success, err = pcall(loadstring(code))
+        if not success then
+            warn("Execution Error:", err)
+        end
+    end
+end)
+
+-- Browse Scripts Button (Minimalistic)
+local browseButton = createButton("Browse Scripts", 225)
+
+-- Predefined script snippets
+local scriptSnippets = {
+    {name = "Kill All", code = [[
+        for _, v in pairs(game.Players:GetPlayers()) do
+            if v.Character and v ~= game.Players.LocalPlayer then
+                v.Character:BreakJoints()
+            end
+        end
+    ]]},
+    {name = "Speed Boost", code = [[
+        game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = 100
+    ]]},
+    {name = "ESP Example", code = [[
+        for _, plr in pairs(game.Players:GetPlayers()) do
+            if plr ~= game.Players.LocalPlayer and plr.Character then
+                local head = plr.Character:FindFirstChild("Head")
+                if head then
+                    local tag = Instance.new("BillboardGui", head)
+                    tag.Size = UDim2.new(0, 100, 0, 20)
+                    tag.AlwaysOnTop = true
+                    local label = Instance.new("TextLabel", tag)
+                    label.Size = UDim2.new(1, 0, 1, 0)
+                    label.BackgroundTransparency = 1
+                    label.Text = plr.Name
+                    label.TextColor3 = Color3.fromRGB(255, 255, 0)
+                    label.TextScaled = true
+                end
+            end
+        end
+    ]]},
+}
+
+-- Function to create the Browse Window
+local function createBrowseWindow()
+    local browseWindow = Instance.new("Frame")
+    browseWindow.Size = UDim2.new(0, 500, 0, 400)
+    browseWindow.Position = UDim2.new(0.5, -250, 0.5, -200)
+    browseWindow.BackgroundColor3 = Color3.fromRGB(28, 28, 28)
+    browseWindow.BorderSizePixel = 0
+    browseWindow.AnchorPoint = Vector2.new(0.5, 0.5)
+    browseWindow.Parent = screenGui
+
+    local browseTitle = Instance.new("TextLabel")
+    browseTitle.Size = UDim2.new(1, 0, 0, 30)
+    browseTitle.Text = "Select a Script"
+    browseTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
+    browseTitle.BackgroundTransparency = 1
+    browseTitle.Font = Enum.Font.Gotham
+    browseTitle.TextSize = 18
+    browseTitle.TextXAlignment = Enum.TextXAlignment.Center
+    browseTitle.Parent = browseWindow
+
+    -- Scrollable frame for script buttons
+    local scrollFrame = Instance.new("ScrollingFrame")
+    scrollFrame.Size = UDim2.new(1, 0, 0, 300)
+    scrollFrame.Position = UDim2.new(0, 0, 0, 30)
+    scrollFrame.BackgroundTransparency = 1
+    scrollFrame.CanvasSize = UDim2.new(0, 0, 0, #scriptSnippets * 50)
+    scrollFrame.ScrollBarThickness = 8
+    scrollFrame.Parent = browseWindow
+
+    -- Add each script as a button in the list
+    for i, script in ipairs(scriptSnippets) do
+        local scriptButton = Instance.new("TextButton")
+        scriptButton.Size = UDim2.new(1, -20, 0, 40)
+        scriptButton.Position = UDim2.new(0, 10, 0, (i - 1) * 50)
+        scriptButton.Text = script.name
+        scriptButton.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+        scriptButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+        scriptButton.Font = Enum.Font.Gotham
+        scriptButton.TextSize = 16
+        scriptButton.BorderSizePixel = 0
+        scriptButton.Parent = scrollFrame
+
+        scriptButton.MouseButton1Click:Connect(function()
+            textBox.Text = script.code
+            browseWindow:Destroy()  -- Close the browse window when a script is selected
+        end)
+    end
+
+    -- Close Button for Browse Window
+    local closeBrowseButton = Instance.new("TextButton")
+    closeBrowseButton.Size = UDim2.new(0, 30, 0, 30)
+    closeBrowseButton.Position = UDim2.new(1, -30, 0, 0)
+    closeBrowseButton.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+    closeBrowseButton.Text = "X"
+    closeBrowseButton.Font = Enum.Font.Code
+    closeBrowseButton.TextColor3 = Color3.fromRGB(255, 100, 100)
+    closeBrowseButton.TextSize = 16
+    closeBrowseButton.BorderSizePixel = 0
+    closeBrowseButton.Parent = browseWindow
+
+    closeBrowseButton.MouseButton1Click:Connect(function()
+        browseWindow:Destroy()
+    end)
+end
+
+-- Open Browse Scripts window when button is clicked
+browseButton.MouseButton1Click:Connect(function()
+    createBrowseWindow()
+end)
+
+-- Make GUI draggable
+local dragging, dragInput, dragStart, startPos
+
+titleBar.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = true
+        dragStart = input.Position
+        startPos = mainFrame.Position
+
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+            end
+        end)
+    end
+end)
+
+titleBar.InputChanged:Connect(function(input)
+    if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+        local delta = input.Position - dragStart
+        mainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    end
+end)
